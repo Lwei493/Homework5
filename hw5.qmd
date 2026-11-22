@@ -268,6 +268,7 @@ setMethod("as.numeric", "waldCI", function(x, ...) {
 ```
 
 ### 9. transformCI method: takes in a function and a waldCI, and returns the transformed waldCI object. Warn the user that only monotonic functions make sense.
+
 ```{r}
 setGeneric("transformCI", function(ci, func) standardGeneric("transformCI"))
 
@@ -386,7 +387,19 @@ table_2a <- atp[, .(number_of_tournaments = uniqueN(tourney_id))]
 print(table_2a)
 ```
 
-There were 128 distinct tournaments in the 2019.
+There were 128 distinct tournaments in the 2019. However, a problem has arisen here. The single Davis Cup event has been split into many different entries.
+```{r}
+atp[grepl("Davis Cup", tourney_name)][1:5,1:3]
+```
+```{r}
+library(stringr)
+atp[, tourney_name := str_replace(tourney_name, "Davis.*", "Davis Cup")]
+
+uniqueN(atp$tourney_name)
+```
+Using the stringr package (specifically str_replace with regex "Davis.*") cleans the data by unifying all these variations into a single standard name "Davis Cup". 
+
+There were actually only 69 distinct tournaments.
 
 ## b.
 
@@ -408,6 +421,7 @@ print(most_wins)
 ```
 
 Twelve players won more than one tournament, and Dominic Thiem and Novak Djokovic tied for the most wins, with 5 tournaments each.
+
 
 ## c.
 
@@ -479,7 +493,7 @@ plot_3a <- plot_ly(
   y = ~total_cases_avg,
   type = "scatter",
   mode = "lines",
-  line = list(color = "darkblue", width = 1),
+  line = list(color = "darkblue", width = 3),
   name = "7-Day Avg"
 ) %>%
   layout(
@@ -535,7 +549,7 @@ plot_3b <- plot_ly(
   colors = c("darkred", "darkblue"),
   type = "scatter",
   mode = "lines",
-  line = list(width = 1.5)
+  line = list(width = 3)
 ) %>%
   layout(
     title = list(
@@ -596,7 +610,7 @@ plot_3c <- plot_ly(
   color = ~state,
   type = "scatter",
   mode = "lines",
-  line = list(width = 1.5)
+  line = list(width = 3)
 ) %>%
   layout(
     title = list(
